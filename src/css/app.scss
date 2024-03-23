@@ -1,0 +1,27 @@
+:root {
+  --zmp-primary-color: #335BBA;
+  --zmp-page-bg-color: #ffffff;
+  --zmp-appbar-app-offset: 108px;
+  --zmp-button-border-radius: 8px;
+  --custom-header: 44px;
+  --custom-header-padding-right: 105px;
+}
+
+.zaui-page {
+  padding-top: var(--custom-header);
+  background-color: var(--zmp-page-bg-color);
+}
+
+.zaui-sheet-content {
+  max-height: calc(100vh - var(--custom-header));
+}
+
+::-webkit-scrollbar {
+  width: 0;  /* Remove scrollbar space */
+  height: 0;
+  background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}

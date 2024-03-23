@@ -1,0 +1,16 @@
+{
+  "app": {
+    "title": "Game Mini App",
+    "headerColor": "",
+    "textColor": "black",
+    "statusBarColor": "#335BBA",
+    "leftButton": "none"
+  },
+  "debug": false,
+  "listCSS": [],
+  "listSyncJS": [],
+  "listAsyncJS": [],
+  "pages": [
+    "/game"
+  ]
+}

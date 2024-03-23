@@ -1,0 +1,15 @@
+{
+  "json.maxItemsComputed": 5000000,
+  "terminal.fontSize": 12,
+  "editor.fontSize": 14,
+  "cSpell.words": [
+    "clsx",
+    "Swiper",
+    "tailwindcss",
+    "Timeago",
+    "usehooks",
+    "zalo",
+    "zaui",
+    "zustand"
+  ]
+}
