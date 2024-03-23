@@ -14,7 +14,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
   const { openSnackbar } = useSnackbar();
 
   const { user } = useUserStore();
-  const { gameSelected, selectGame } = useGameStore();
+  const { gameSelected, playGame, resetGame } = useGameStore();
 
   const [room, setRoom] = useState<Room | undefined>(undefined);
   const [listUser, setListUser] = useState<Array<RoomUser>>([]);
@@ -62,7 +62,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
       setListUser(data.listUser);
     });
     socket.on("play", (data) => {
-      selectGame(data);
+      playGame(data);
     });
 
     return () => {
@@ -76,6 +76,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
 
     return () => {
       socket.disconnect();
+      resetGame();
     };
   }, []);
 

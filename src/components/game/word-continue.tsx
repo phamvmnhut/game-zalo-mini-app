@@ -5,10 +5,11 @@ import { useUserStore } from "@store/useUser";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import Countdown from "react-countdown";
-import { Button, Icon, Input, Modal, useSnackbar } from "zmp-ui";
+import { Button, Icon, Input, Modal, useNavigate, useSnackbar } from "zmp-ui";
 
 export function WordContinue() {
   const { openSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const { user } = useUserStore();
   const {
@@ -18,19 +19,30 @@ export function WordContinue() {
     endTurnTime,
     history,
     roomGameId,
-    selectGame,
+    updateRound,
+    updateWinner,
+    userList,
   } = useGameStore();
 
   const [value, setValue] = useState<string>("");
-  const [popupVisible, setPopupVisible] = useState(false);
+  const [popupGuideToPlayVisible, setPopupGuideToPlayVisible] = useState(false);
+  const [popupWinnerVisible, setPopupWinnerVisible] = useState(false);
 
   useEffect(() => {
     socket.on("new_submit", (data) => {
-      selectGame(data);
+      updateRound(data);
+    });
+
+    socket.on("ended", (data) => {
+      // updateWinner(data);
+      if (data) {
+        // setPopupWinnerVisible(true);
+      }
     });
 
     return () => {
       socket.off("new_submit", () => {});
+      socket.off("ended", () => {});
     };
   }, []);
 
@@ -39,11 +51,17 @@ export function WordContinue() {
     return currentValue?.split(" ")[1];
   }, [currentValue]);
 
+  const currentUser = useMemo(() => {
+    console.log(userList);
+    if (!userList) return undefined;
+    return userList.find((e) => e.userId == currentTurn);
+  }, [currentTurn, userList]);
+
   const submit = () => {
     if (
       user == undefined ||
       currentTurn == undefined ||
-      user.id.toString() != currentTurn
+      user.id != currentTurn
     ) {
       openSnackbar({
         text: "Không đến lượt",
@@ -80,7 +98,7 @@ export function WordContinue() {
         <div className="flex flex-col gap-3">
           <div className="flex flex-row justify-between items-center">
             <div className="font-bold">Game nối chữ</div>
-            <div className="" onClick={() => setPopupVisible(true)}>
+            <div className="" onClick={() => setPopupGuideToPlayVisible(true)}>
               <Icon icon="zi-info-circle" />
             </div>
           </div>
@@ -111,22 +129,44 @@ export function WordContinue() {
               </Button>
             </>
           ) : (
-            <div className="self-center mt-5">Lượt của đối thủ</div>
+            <div className="self-center mt-5">
+              Đến lượt của{" "}
+              <span className="font-bold">{currentUser?.user.username}</span>
+            </div>
           )}
         </div>
       </div>
       <Modal
-        visible={popupVisible}
+        visible={popupGuideToPlayVisible}
         title="Hướng dẫn game Nối chữ"
         onClose={() => {
-          setPopupVisible(false);
+          setPopupGuideToPlayVisible(false);
         }}
         description="Đây là hướng dẫn game nối chữ"
       >
         <Button
           className="!mt-5"
           onClick={() => {
-            setPopupVisible(false);
+            setPopupGuideToPlayVisible(false);
+          }}
+          fullWidth
+        >
+          Xác nhận
+        </Button>
+      </Modal>
+      <Modal
+        visible={popupWinnerVisible}
+        title="Game kết thúc"
+        onClose={() => {
+          setPopupWinnerVisible(false);
+        }}
+      >
+        <div className="flex flex-col"></div>
+        <Button
+          className="!mt-5"
+          onClick={() => {
+            setPopupWinnerVisible(false);
+            navigate(-1);
           }}
           fullWidth
         >

@@ -1,20 +1,26 @@
 import { BE_API } from "@config";
-import { Room } from "@type/room";
+import { Room, RoomUser } from "@type/room";
 import axios from "axios";
 import { create } from "zustand";
 
 type GameState = {
   roomGameId?: number,
   gameSelected?: number,
-  currentTurn?: string;
+  currentTurn?: number;
   currentValue?: string;
   nextTurn?: string;
   endTurnTime?: number;
+  currentRound?: number;
   history: [];
+  userList: Array<RoomUser>;
+  winner?: RoomUser
 };
 
 type GameAction = {
-  selectGame: (data: any) => void;
+  playGame: (data: any) => void;
+  updateRound: (data: any) => void;
+  resetGame: VoidFunction;
+  updateWinner: (data: any) => void;
 };
 
 const defaultStore: GameState = {
@@ -24,12 +30,16 @@ const defaultStore: GameState = {
   currentValue: undefined,
   nextTurn: undefined,
   endTurnTime: undefined,
-  history: []
+  currentRound: undefined,
+  history: [],
+  userList: [],
+  winner: undefined,
 };
 
 const useGameStore = create<GameState & GameAction>()((set, get) => ({
   ...defaultStore,
-  selectGame: (data: any) => {
+  playGame: (data: any) => {
+    console.log("ser", data)
     set({
       roomGameId: parseInt(data.id, 10),
       gameSelected: data.gameType,
@@ -38,6 +48,27 @@ const useGameStore = create<GameState & GameAction>()((set, get) => ({
       nextTurn: data.dataJson.nextTurn,
       endTurnTime: data.dataJson.endTurnTime,
       history: [],
+      userList: data.userList
+    })
+  },
+  updateRound: (data: any) => {
+    set({
+      currentTurn: data.dataJson.currentTurn,
+      currentValue: data.dataJson.currentValue,
+      nextTurn: data.dataJson.nextTurn,
+      endTurnTime: data.dataJson.endTurnTime,
+      currentRound: data.dataJson.currentRound,
+      history: [],
+    })
+  },
+  resetGame: () => {
+    set({
+      ...defaultStore
+    })
+  },
+  updateWinner: (data: any) => {
+    set({
+      winner: get().userList.find((e) => e.id == data.id)
     })
   }
 }));
