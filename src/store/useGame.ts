@@ -11,9 +11,14 @@ type GameState = {
   nextTurn?: string;
   endTurnTime?: number;
   currentRound?: number;
-  history: [];
+  history: Array<{
+    userId: number;
+    value: string;
+    time: number;
+  }>;
   userList: Array<RoomUser>;
-  winner?: RoomUser
+  winner?: RoomUser;
+  numberGuest: Array<string>;
 };
 
 type GameAction = {
@@ -34,6 +39,7 @@ const defaultStore: GameState = {
   history: [],
   userList: [],
   winner: undefined,
+  numberGuest: [],
 };
 
 const useGameStore = create<GameState & GameAction>()((set, get) => ({
@@ -42,12 +48,15 @@ const useGameStore = create<GameState & GameAction>()((set, get) => ({
     set({
       roomGameId: parseInt(data.id, 10),
       gameSelected: data.gameType,
+      userList: data.userList,
+
       currentTurn: data.dataJson.currentTurn,
       currentValue: data.dataJson.currentValue,
       nextTurn: data.dataJson.nextTurn,
       endTurnTime: data.dataJson.endTurnTime,
-      history: [],
-      userList: data.userList
+      currentRound: data.dataJson.currentRound,
+      history: data.dataJson.history,
+      numberGuest: data.dataJson.numberGuest,
     })
   },
   updateRound: (data: any) => {
@@ -57,7 +66,8 @@ const useGameStore = create<GameState & GameAction>()((set, get) => ({
       nextTurn: data.dataJson.nextTurn,
       endTurnTime: data.dataJson.endTurnTime,
       currentRound: data.dataJson.currentRound,
-      history: [],
+      history: data.dataJson.history,
+      numberGuest: data.dataJson.numberGuest,
     })
   },
   resetGame: () => {

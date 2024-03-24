@@ -62,6 +62,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
       setListUser(data.listUser);
     });
     socket.on("play", (data) => {
+      console.log("play game", data);
       playGame(data);
     });
 
@@ -88,6 +89,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
       })
       .then(() => {
         setIsConnected(true);
+        console.log("join emit", user?.id);
         socket.emit("join", {
           roomId: roomId,
           userId: user?.id,
@@ -106,7 +108,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
       .put(BE_API + "/room/" + roomId + "/start", {
         roomId: roomId,
         gameType: 1,
-        joinedSocket: listUser.map((e) => e.id),
+        joinedSocket: listUser.map((e) => e.userId),
       })
       .catch((e) => {
         openSnackbar({
@@ -117,7 +119,18 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
   };
 
   const game2 = () => {
-    // setSelectedGame(2);
+    axios
+      .put(BE_API + "/room/" + roomId + "/start", {
+        roomId: roomId,
+        gameType: 2,
+        joinedSocket: listUser.map((e) => e.userId),
+      })
+      .catch((e) => {
+        openSnackbar({
+          text: e.response.data.message,
+          type: "error",
+        });
+      });
   };
 
   return (
