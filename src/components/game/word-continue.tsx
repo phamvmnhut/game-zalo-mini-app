@@ -70,7 +70,8 @@ export function WordContinue() {
       // call api
       axios
         .put(BE_API + "/game/" + roomGameId + "/submit", {
-          word: lastWord == "." ? value.trim() : lastWord + " " + value.trim(),
+          userId: user?.id,
+          word: lastWord == "." ? value.trim() : lastWord + " " + value.toLowerCase().trim(),
           roomGameId: roomGameId,
         })
         .then(() => {
