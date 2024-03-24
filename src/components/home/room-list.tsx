@@ -1,18 +1,27 @@
 import { BE_API, ROUTES } from "@config";
+import { useRoomStore } from "@store/useRoom";
 import { useUserStore } from "@store/useUser";
-import { Room } from "@type/room";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ReactTimeago from "react-timeago";
-import { Avatar, Button, Input, Sheet, useNavigate, useSnackbar } from "zmp-ui";
+import {
+  Avatar,
+  Button,
+  Icon,
+  Input,
+  Sheet,
+  Spinner,
+  useNavigate,
+  useSnackbar,
+} from "zmp-ui";
 
 export function RoomList() {
   const navigate = useNavigate();
   const { openSnackbar } = useSnackbar();
 
   const { user } = useUserStore();
+  const { roomList, fetchListRoom, loading } = useRoomStore();
 
-  const [roomList, setRoomList] = useState<Array<Room>>([]);
   const [sheetVisible, setSheetVisible] = useState(false);
   const [roomName, setRoomName] = useState<string>("");
 
@@ -44,19 +53,24 @@ export function RoomList() {
         userId: user?.id,
       })
       .then((e) => {
+        fetchListRoom();
         navigate(ROUTES.GAME + "/" + e.data.data.id);
       });
   };
 
   useEffect(() => {
-    axios.get(BE_API + "/room").then((e) => {
-      setRoomList(e.data.data.result);
-    });
+    fetchListRoom();
   }, []);
 
   return (
     <div className="px-3 pt-5">
-      <div className="grid grid-cols-2 gap-x-2 gap-y-2">
+      <div className="flex flex-row justify-between items-start gap-3">
+        <div className="font-bold text-lg">Danh sách phòng</div>
+        <div className="" onClick={fetchListRoom}>
+          <Icon icon="zi-auto-solid" />
+        </div>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-x-2 gap-y-2 relative">
         {roomList.map((e) => {
           return (
             <div
@@ -76,6 +90,13 @@ export function RoomList() {
             </div>
           );
         })}
+        {loading && (
+          <div className="absolute top-0 left-0 w-full bg-gray-50/50 h-full rounded">
+            <div className="mt-5 flex flex-row justify-center w-full">
+              <Spinner />
+            </div>
+          </div>
+        )}
         <div className="h-full rounded shadow-sm px-3 pt-4 pb-2 bg-gradient-to-b from-blue-200 to-blue-100">
           <div className="flex flex-row justify-center items-center">
             <Button onClick={handleCreateRoomBtn} size="small">

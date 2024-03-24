@@ -5,6 +5,7 @@ import { create } from "zustand";
 
 type RoomState = {
   joinedRoom?: Room,
+  loading: boolean,
   roomList: Array<Room>
 };
 
@@ -15,6 +16,7 @@ type RoomAction = {
 
 const defaultStore: RoomState = {
   joinedRoom: undefined,
+  loading: true,
   roomList: [],
 };
 
@@ -27,8 +29,9 @@ const useRoomStore = create<RoomState & RoomAction>()((set, get) => ({
     });
   },
   fetchListRoom: async () => {
+    set({ loading: true });
     const res = await axios.get(BE_API + "/room");
-    set({ roomList: res.data.data });
+    set({ roomList: res.data.data.result, loading: false });
   }
 }));
 
