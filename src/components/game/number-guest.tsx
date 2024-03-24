@@ -31,6 +31,7 @@ export function NumberGuest() {
   const [value, setValue] = useState<string>("");
   const [popupGuideToPlayVisible, setPopupGuideToPlayVisible] = useState(false);
   const [popupWinnerVisible, setPopupWinnerVisible] = useState(false);
+  const [userGuestIndex, setUserGuestIndex] = useState(0);
 
   useEffect(() => {
     socket.on("new_submit", (data) => {
@@ -70,6 +71,10 @@ export function NumberGuest() {
     return isInit && isNotSubmitNumber;
   }, [currentRound, userList, numberGuest, user]);
 
+  const userCanGuest = useMemo(() => {
+    return userList.filter((e) => e.userId != user?.id);
+  }, [userList, user]);
+
   const submit = () => {
     if (!isPlayRound && !isInitRound) {
       openSnackbar({
@@ -82,6 +87,7 @@ export function NumberGuest() {
         .put(BE_API + "/game/" + roomGameId + "/submit", {
           userId: user?.id,
           number: value.toString(),
+          guestFor: userCanGuest[userGuestIndex].userId,
           roomGameId: roomGameId,
         })
         .then(() => {
@@ -117,6 +123,26 @@ export function NumberGuest() {
           </div>
           {isPlayRound || isInitRound ? (
             <>
+              {isPlayRound && (
+                <div className="flex flex-wrap gap-1">
+                  {userCanGuest.map((e, index) => {
+                    return (
+                      <div
+                        key={e.userId}
+                        className={clsV2(
+                          "rounded-sm px-2 py-1",
+                          index == userGuestIndex
+                            ? "bg-blue-300"
+                            : "bg-blue-100"
+                        )}
+                        onClick={() => setUserGuestIndex(index)}
+                      >
+                        {e.user.username}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               <Input
                 className="!m-0"
                 value={value}
@@ -136,12 +162,16 @@ export function NumberGuest() {
           )}
           <div className="" />
           <div className="flex flex-col gap-1">
-            {history.map((e) => {
+            {history.reverse().map((e) => {
               const userIndex = userList.findIndex((u) => u.userId == e.userId);
               const userHere = userList[userIndex];
+              const userGuestedIndex = userList.findIndex(
+                (u) => u.userId == e.guestFor
+              );
+              const userGuested = userList[userGuestedIndex];
               const { matchingDigits, positionMatches } = getMatchingCount(
                 e.value,
-                numberGuest[userIndex]
+                numberGuest[userGuestedIndex]
               );
               return (
                 <div
@@ -152,10 +182,16 @@ export function NumberGuest() {
                   )}
                 >
                   <div className="flex flex-col items-start">
-                    <div className="font-bold">
+                    <div>
                       {userHere.userId == user?.id
                         ? "Bạn"
                         : userHere.user.username}
+                      {" -> "}
+                      <span className="font-bold">
+                        {userGuested.userId == user?.id
+                          ? "Bạn"
+                          : userGuested.user.username}
+                      </span>
                     </div>
                     <div className="">{e.value}</div>
                   </div>

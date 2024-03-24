@@ -15,6 +15,7 @@ type GameState = {
     userId: number;
     value: string;
     time: number;
+    guestFor: number;
   }>;
   userList: Array<RoomUser>;
   winner?: RoomUser;
