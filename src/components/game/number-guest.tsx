@@ -143,6 +143,11 @@ export function NumberGuest() {
                   })}
                 </div>
               )}
+              {isInitRound && (
+                <div className="flex flex-wrap gap-1">
+                  Nhập số để đối thủ đoán:
+                </div>
+              )}
               <Input
                 className="!m-0"
                 value={value}
@@ -160,48 +165,53 @@ export function NumberGuest() {
               <span className="font-bold">{currentUser?.user.username}</span>
             </div>
           )}
-          <div className="" />
           <div className="flex flex-col gap-1">
-            {history.reverse().map((e) => {
-              const userIndex = userList.findIndex((u) => u.userId == e.userId);
-              const userHere = userList[userIndex];
-              const userGuestedIndex = userList.findIndex(
-                (u) => u.userId == e.guestFor
-              );
-              const userGuested = userList[userGuestedIndex];
-              const { matchingDigits, positionMatches } = getMatchingCount(
-                e.value,
-                numberGuest[userGuestedIndex]
-              );
-              return (
-                <div
-                  key={e.time}
-                  className={clsV2(
-                    "flex flex-row justify-between rounded p-2",
-                    userHere.userId == user?.id ? " bg-blue-400" : "bg-blue-200"
-                  )}
-                >
-                  <div className="flex flex-col items-start">
-                    <div>
-                      {userHere.userId == user?.id
-                        ? "Bạn"
-                        : userHere.user.username}
-                      {" -> "}
-                      <span className="font-bold">
-                        {userGuested.userId == user?.id
+            {history
+              .sort((a, b) => b.time - a.time)
+              .map((e) => {
+                const userIndex = userList.findIndex(
+                  (u) => u.userId == e.userId
+                );
+                const userHere = userList[userIndex];
+                const userGuestedIndex = userList.findIndex(
+                  (u) => u.userId == e.guestFor
+                );
+                const userGuested = userList[userGuestedIndex];
+                const { matchingDigits, positionMatches } = getMatchingCount(
+                  e.value,
+                  numberGuest[userGuestedIndex]
+                );
+                return (
+                  <div
+                    key={e.time}
+                    className={clsV2(
+                      "flex flex-row justify-between rounded p-2",
+                      userHere.userId == user?.id
+                        ? " bg-blue-400"
+                        : "bg-blue-200"
+                    )}
+                  >
+                    <div className="flex flex-col items-start">
+                      <div>
+                        {userHere.userId == user?.id
                           ? "Bạn"
-                          : userGuested.user.username}
-                      </span>
+                          : userHere.user.username}
+                        {" -> "}
+                        <span className="font-bold">
+                          {userGuested.userId == user?.id
+                            ? "Bạn"
+                            : userGuested.user.username}
+                        </span>
+                      </div>
+                      <div className="">{e.value}</div>
                     </div>
-                    <div className="">{e.value}</div>
+                    <div className="flex flex-col items-end">
+                      <div className="">Số đúng: {matchingDigits}</div>
+                      <div className="">Vị trí đúng: {positionMatches} </div>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="">Số đúng: {matchingDigits}</div>
-                    <div className="">Vị trí đúng: {positionMatches} </div>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       </div>
