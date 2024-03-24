@@ -52,7 +52,6 @@ export function WordContinue() {
   }, [currentValue]);
 
   const currentUser = useMemo(() => {
-    console.log(userList);
     if (!userList) return undefined;
     return userList.find((e) => e.userId == currentTurn);
   }, [currentTurn, userList]);
