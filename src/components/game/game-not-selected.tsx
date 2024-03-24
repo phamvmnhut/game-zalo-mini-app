@@ -62,7 +62,6 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
       setListUser(data.listUser);
     });
     socket.on("play", (data) => {
-      console.log("play game", data);
       playGame(data);
     });
 
@@ -89,7 +88,6 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
       })
       .then(() => {
         setIsConnected(true);
-        console.log("join emit", user?.id);
         socket.emit("join", {
           roomId: roomId,
           userId: user?.id,

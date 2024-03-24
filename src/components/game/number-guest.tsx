@@ -33,7 +33,6 @@ export function NumberGuest() {
 
   useEffect(() => {
     socket.on("new_submit", (data) => {
-      console.log("new update", data);
       updateRound(data);
     });
 
@@ -64,11 +63,6 @@ export function NumberGuest() {
   const isInitRound = useMemo(() => {
     const isInit = currentRound == 1;
     const index = userList.findIndex((e) => e.userId == user?.id);
-    console.log({
-      index,
-      "user?.id": user?.id,
-      numberGuest,
-    });
     if (index == -1) return false;
     if (numberGuest.length < index) return false;
     const isNotSubmitNumber = numberGuest[index] == "0000";
