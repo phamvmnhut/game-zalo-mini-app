@@ -7,7 +7,7 @@ import { getGameTypeFromNumber } from "@utils/game";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import ReactTimeago from "react-timeago";
-import { Avatar, Button, Icon, useNavigate, useSnackbar } from "zmp-ui";
+import { Avatar, Button, Icon, Modal, useNavigate, useSnackbar } from "zmp-ui";
 
 export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
 
   const [room, setRoom] = useState<Room | undefined>(undefined);
   const [listUser, setListUser] = useState<Array<RoomUser>>([]);
+  const [popupGuideToPlayVisible, setPopupGuideToPlayVisible] = useState(false);
 
   const [isConnected, setIsConnected] = useState(socket.connected);
 
@@ -204,9 +205,47 @@ export function GameNotSelected({ roomId }: { roomId: string | undefined }) {
             </div>
           )}
           {gameSelected !== undefined && (
-            <div className="font-bold text-xl px-2 py-3 bg-blue-50 shadow-sm">
-              {room?.name}
-            </div>
+            <>
+              <div className="flex flex-row justify-between gap-2 bg-blue-50 px-2 py-3">
+                <div className="font-bold text-xl shadow-sm">{room?.name}</div>
+                <div
+                  className=""
+                  onClick={() => setPopupGuideToPlayVisible(true)}
+                >
+                  <Icon icon="zi-setting" />
+                </div>
+              </div>
+              <Modal
+                visible={popupGuideToPlayVisible}
+                title="Thiết lập"
+                onClose={() => {
+                  setPopupGuideToPlayVisible(false);
+                }}
+              >
+                <Button
+                  className="!mt-5"
+                  onClick={() => {
+                    setPopupGuideToPlayVisible(false);
+                    resetGame();
+                  }}
+                  fullWidth
+                >
+                  Thoát game
+                </Button>
+                {isOwnerRoom && (
+                  <Button
+                    className="!mt-5"
+                    onClick={() => {
+                      setPopupGuideToPlayVisible(false);
+                      resetGame();
+                    }}
+                    fullWidth
+                  >
+                    Kết thúc game
+                  </Button>
+                )}
+              </Modal>
+            </>
           )}
         </>
       )}
