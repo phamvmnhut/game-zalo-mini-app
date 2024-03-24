@@ -39,7 +39,6 @@ const defaultStore: GameState = {
 const useGameStore = create<GameState & GameAction>()((set, get) => ({
   ...defaultStore,
   playGame: (data: any) => {
-    console.log("ser", data)
     set({
       roomGameId: parseInt(data.id, 10),
       gameSelected: data.gameType,
