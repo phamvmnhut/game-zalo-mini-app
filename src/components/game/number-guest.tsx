@@ -2,6 +2,7 @@ import { BE_API } from "@config";
 import { socket } from "@services/socket-game";
 import { useGameStore } from "@store/useGame";
 import { useUserStore } from "@store/useUser";
+import { clsV2 } from "@utils/cls";
 import { getMatchingCount } from "@utils/number-guest-game";
 import axios from "axios";
 import React, { useEffect, useMemo, useState } from "react";
@@ -111,54 +112,13 @@ export function NumberGuest() {
               <Icon icon="zi-info-circle" />
             </div>
           </div>
-          <table>
-            <thead>
-              <tr>
-                {userList.map((e, index) => {
-                  return (
-                    <th key={index}>
-                      {e.userId == user?.id
-                        ? numberGuest[index]
-                        : e.user.username}
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {userList.map((e, index) => {
-                  return (
-                    <td key={index} className="h-auto">
-                      <div className="flex flex-col items-center justify-start w-full h-full ">
-                        {history
-                          .filter((h) => h.userId == user?.id)
-                          .map((h) => {
-                            const [matchCount, isMatch] = getMatchingCount(
-                              h.value,
-                              numberGuest[index]
-                            );
-                            return (
-                              <div className="" key={h.time}>
-                                {e.userId == user?.id ? (
-                                  <div>{h.value}</div>
-                                ) : (
-                                  <div>{matchCount} {isMatch && "Đúng hết"}</div>
-                                )}
-                              </div>
-                            );
-                          })}
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            </tbody>
-          </table>
+          <div className="font-bold text-3xl self-center py-2">
+            {numberGuest[userList.findIndex((e) => e.userId == user?.id)]}
+          </div>
           {isPlayRound || isInitRound ? (
             <>
               <Input
-                className="!m-0 !rounded-l-none"
+                className="!m-0"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -174,6 +134,39 @@ export function NumberGuest() {
               <span className="font-bold">{currentUser?.user.username}</span>
             </div>
           )}
+          <div className="" />
+          <div className="flex flex-col gap-1">
+            {history.map((e) => {
+              const userIndex = userList.findIndex((u) => u.userId == e.userId);
+              const userHere = userList[userIndex];
+              const { matchingDigits, positionMatches } = getMatchingCount(
+                e.value,
+                numberGuest[userIndex]
+              );
+              return (
+                <div
+                  key={e.time}
+                  className={clsV2(
+                    "flex flex-row justify-between rounded p-2",
+                    userHere.userId == user?.id ? " bg-blue-400" : "bg-blue-200"
+                  )}
+                >
+                  <div className="flex flex-col items-start">
+                    <div className="font-bold">
+                      {userHere.userId == user?.id
+                        ? "Bạn"
+                        : userHere.user.username}
+                    </div>
+                    <div className="">{e.value}</div>
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <div className="">Số đúng: {matchingDigits}</div>
+                    <div className="">Vị trí đúng: {positionMatches} </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
       <Modal
