@@ -1,3 +1,4 @@
+import { OTPInput } from "@components/ui/input-opt";
 import { BE_API } from "@config";
 import { socket } from "@services/socket-game";
 import { useGameStore } from "@store/useGame";
@@ -5,7 +6,7 @@ import { useUserStore } from "@store/useUser";
 import { clsV2 } from "@utils/cls";
 import { getMatchingCount } from "@utils/number-guest-game";
 import axios from "axios";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Countdown from "react-countdown";
 import { Button, Icon, Input, Modal, useNavigate, useSnackbar } from "zmp-ui";
 
@@ -75,6 +76,8 @@ export function NumberGuest() {
     return userList.filter((e) => e.userId != user?.id);
   }, [userList, user]);
 
+  const otpRef = useRef<{ reset: () => void }>(null);
+
   const submit = () => {
     if (!isPlayRound && !isInitRound) {
       openSnackbar({
@@ -92,6 +95,7 @@ export function NumberGuest() {
         })
         .then(() => {
           setValue("");
+          otpRef.current?.reset();
         })
         .catch((e) => {
           openSnackbar({
@@ -99,12 +103,6 @@ export function NumberGuest() {
             type: "error",
           });
         });
-    }
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      submit();
     }
   };
 
@@ -121,6 +119,11 @@ export function NumberGuest() {
           <div className="font-bold text-3xl self-center py-2">
             {numberGuest[userList.findIndex((e) => e.userId == user?.id)]}
           </div>
+
+          <div className="flex flex-row justify-center">
+            <OTPInput ref={otpRef} length={4} onComplete={(e) => setValue(e)} />
+          </div>
+
           {isPlayRound || isInitRound ? (
             <>
               {isPlayRound && (
@@ -148,14 +151,7 @@ export function NumberGuest() {
                   Nhập số để đối thủ đoán:
                 </div>
               )}
-              <Input
-                className="!m-0"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Nhập số"
-              />
-              <Button className="!mt-3" onClick={submit}>
+              <Button className="!mt-0" onClick={submit}>
                 Gửi
               </Button>
             </>
@@ -165,7 +161,8 @@ export function NumberGuest() {
               <span className="font-bold">{currentUser?.user.username}</span>
             </div>
           )}
-          <div className="flex flex-col gap-1">
+
+          <div className="mt-2 flex flex-col gap-1">
             {history
               .sort((a, b) => b.time - a.time)
               .map((e) => {
