@@ -96,7 +96,7 @@ export function WordContinue() {
     <>
       <div className="px-3">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row mt-3 justify-between items-center">
             <div className="font-bold">Game nối chữ</div>
             <div className="" onClick={() => setPopupGuideToPlayVisible(true)}>
               <Icon icon="zi-info-circle" />

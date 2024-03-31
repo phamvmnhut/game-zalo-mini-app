@@ -8,7 +8,15 @@ import { getMatchingCount } from "@utils/number-guest-game";
 import axios from "axios";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Countdown from "react-countdown";
-import { Button, Icon, Input, Modal, useNavigate, useSnackbar } from "zmp-ui";
+import {
+  Avatar,
+  Button,
+  Icon,
+  Input,
+  Modal,
+  useNavigate,
+  useSnackbar,
+} from "zmp-ui";
 
 export function NumberGuest() {
   const { openSnackbar } = useSnackbar();
@@ -110,22 +118,26 @@ export function NumberGuest() {
     <>
       <div className="px-3">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-row justify-between items-center">
+          <div className="flex flex-row justify-between items-center mt-3">
             <div className="font-bold">Game Đoán số</div>
             <div className="" onClick={() => setPopupGuideToPlayVisible(true)}>
               <Icon icon="zi-info-circle" />
             </div>
           </div>
-          <div className="font-bold text-3xl self-center py-2">
-            {numberGuest[userList.findIndex((e) => e.userId == user?.id)]}
-          </div>
+          <div className="bg-blue-200/50 rounded-md px-3 py-3">
+            <div className="font-bold text-3xl self-center text-center py-3">
+              {numberGuest[userList.findIndex((e) => e.userId == user?.id)]}
+            </div>
 
-          <div className="flex flex-row justify-center">
-            <OTPInput ref={otpRef} length={4} onComplete={(e) => setValue(e)} />
-          </div>
+            <div className="flex flex-row justify-center">
+              <OTPInput
+                ref={otpRef}
+                length={4}
+                onComplete={(e) => setValue(e)}
+              />
+            </div>
 
-          {isPlayRound || isInitRound ? (
-            <>
+            <div className="flex flex-col justify-center">
               {isPlayRound && (
                 <div className="flex flex-wrap gap-1">
                   {userCanGuest.map((e, index) => {
@@ -147,70 +159,82 @@ export function NumberGuest() {
                 </div>
               )}
               {isInitRound && (
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1 py-1">
                   Nhập số để đối thủ đoán:
                 </div>
               )}
-              <Button className="!mt-0" onClick={submit}>
+              {!(isPlayRound || isInitRound) && (
+                <div className="py-1">
+                  Đến lượt của{" "}
+                  <span className="font-bold">
+                    {currentUser?.user.username}
+                  </span>
+                </div>
+              )}
+              <Button
+                className="!mt-2"
+                onClick={submit}
+                disabled={!(isPlayRound || isInitRound)}
+              >
                 Gửi
               </Button>
-            </>
-          ) : (
-            <div className="self-center mt-5">
-              Đến lượt của{" "}
-              <span className="font-bold">{currentUser?.user.username}</span>
             </div>
-          )}
-
-          <div className="mt-2 flex flex-col gap-1">
-            {history
-              .sort((a, b) => b.time - a.time)
-              .map((e) => {
-                const userIndex = userList.findIndex(
-                  (u) => u.userId == e.userId
-                );
-                const userHere = userList[userIndex];
-                const userGuestedIndex = userList.findIndex(
-                  (u) => u.userId == e.guestFor
-                );
-                const userGuested = userList[userGuestedIndex];
-                const { matchingDigits, positionMatches } = getMatchingCount(
-                  e.value,
-                  numberGuest[userGuestedIndex]
-                );
-                return (
-                  <div
-                    key={e.time}
-                    className={clsV2(
-                      "flex flex-row justify-between rounded p-2",
-                      userHere.userId == user?.id
-                        ? " bg-blue-400"
-                        : "bg-blue-200"
-                    )}
-                  >
-                    <div className="flex flex-col items-start">
-                      <div>
-                        {userHere.userId == user?.id
-                          ? "Bạn"
-                          : userHere.user.username}
-                        {" -> "}
-                        <span className="font-bold">
-                          {userGuested.userId == user?.id
-                            ? "Bạn"
-                            : userGuested.user.username}
-                        </span>
-                      </div>
-                      <div className="">{e.value}</div>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <div className="">Số đúng: {matchingDigits}</div>
-                      <div className="">Vị trí đúng: {positionMatches} </div>
-                    </div>
-                  </div>
-                );
-              })}
           </div>
         </div>
+      </div>
+      <div className="mt-2 flex flex-col gap-1 px-3">
+        <div className="flex flex-row items-center gap-2">
+          <div className={clsV2("rounded-sm px-2 py-1", "bg-blue-300")}>
+            Lịch sử
+          </div>
+        </div>
+      </div>
+      <div className="flex-grow overflow-y-auto flex flex-col gap-2 px-3 bg-gray-100/50 pt-4 mx-3 mb-3 rounded-lg shadow-sm">
+        {history
+          .sort((a, b) => a.time - b.time)
+          .map((e) => {
+            const userIndex = userList.findIndex((u) => u.userId == e.userId);
+            const userHere = userList[userIndex];
+            const userGuestedIndex = userList.findIndex(
+              (u) => u.userId == e.guestFor
+            );
+            const userGuested = userList[userGuestedIndex];
+            const { matchingDigits, positionMatches } = getMatchingCount(
+              e.value,
+              numberGuest[userGuestedIndex]
+            );
+            return (
+              <div
+                key={e.time}
+                className={clsV2(
+                  "flex flex-row items-end gap-2 justify-end",
+                  userHere.userId == user?.id ? "" : "flex-row-reverse"
+                )}
+              >
+                <div
+                  className={clsV2(
+                    "flex flex-col px-2 py-1 rounded-md",
+                    userHere.userId == user?.id ? " bg-blue-200" : "bg-gray-100"
+                  )}
+                >
+                  <div>
+                    {"Đoán "}
+                    <span className="font-bold">
+                      {userGuested.userId == user?.id
+                        ? "Bạn"
+                        : userGuested.user.username}
+                    </span>
+                    {" số "}
+                    {e.value}
+                  </div>
+                  <div className="">
+                    Số đúng: {matchingDigits}, Vị trí đúng: {positionMatches}
+                  </div>
+                </div>
+                <Avatar size={24}>{userHere.user.username}</Avatar>
+              </div>
+            );
+          })}
       </div>
       <Modal
         visible={popupGuideToPlayVisible}
