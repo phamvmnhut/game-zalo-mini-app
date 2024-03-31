@@ -55,6 +55,10 @@ export const OTPInput = forwardRef((props: OTPInputProps, ref) => {
       if (newInputs.every((input) => input !== "")) {
         onComplete(newInputs.join(""));
       }
+    } else if (value === "") {
+      const newInputs = [...inputs];
+      newInputs[index] = "";
+      setInputs(newInputs);
     }
   };
 
